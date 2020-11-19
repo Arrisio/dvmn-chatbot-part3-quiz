@@ -16,8 +16,11 @@ git clone https://github.com/Arrisio/dvmn-chatbot-part3-quiz.git
 ```
 TG_BOT_TOKEN='Ваш токен'
 VK_TOKEN='Ваш токен'
+
 ```
 Следующие переменные окружения опциональны:
+- `REDIS_HOST` - IP или hostname базы redis. По умолчанию - `localhost`.  
+- `REDIS_PORT` - порт базы redis. По умолчанию - `6379`.  
 - `LOG_LEVEL` - уровень логирования, варианты значений - см. официальную документацию [Loguru](https://loguru.readthedocs.io/en/stable/api/logger.html). По умолчанию - `INFO`.  
 
 3. Установить зависимости:
