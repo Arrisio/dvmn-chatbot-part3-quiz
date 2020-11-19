@@ -1,13 +1,12 @@
 import asyncio
 import re
-import os
 import zipfile
 
 import requests
 from loguru import logger
 from tqdm import tqdm
 
-from src.utils import get_logger_conf, redis_ctx_connection, QUESTIONS_DB_ID
+from src.utils import get_logger_conf, get_questions_db_connection, close_all_db_connections
 
 
 def download_file(url, filename: str, chunk_size: int = 1024):
@@ -56,25 +55,30 @@ def fetch_qnas(archive_path):
 async def init_questions(
     questions_archive_url="http://dvmn.org/media/modules_dist/quiz-questions.zip",
 ) -> None:
-    async with redis_ctx_connection(db=QUESTIONS_DB_ID) as redis:
 
-        if await redis.dbsize() > 0:
-            logger.info("questions are ready")
-            return
+    redis = await get_questions_db_connection()
 
-        tmp_quiz_filename = "quiz-questions.zip"
-        logger.debug(tmp_quiz_filename)
-        download_file(
-            url=questions_archive_url,
-            filename=tmp_quiz_filename,
-        )
+    if await redis.dbsize() > 0:
+        logger.info("questions are ready")
+        return
 
-        await asyncio.wait([redis.set(q, a) for q, a in fetch_qnas(tmp_quiz_filename)])
+    tmp_quiz_filename = "quiz-questions.zip"
+    logger.debug(tmp_quiz_filename)
+    download_file(
+        url=questions_archive_url,
+        filename=tmp_quiz_filename,
+    )
 
-        os.remove(tmp_quiz_filename)
+    await asyncio.wait([redis.set(q, a) for q, a in fetch_qnas(tmp_quiz_filename)])
+
+    os.remove(tmp_quiz_filename)
     logger.info("questions are ready")
 
 
 if __name__ == "__main__":
     logger.configure(**get_logger_conf())
-    asyncio.run(init_questions())
+    loop = asyncio.get_event_loop()
+
+    loop.run_until_complete(init_questions())
+    loop.run_until_complete(close_all_db_connections())
+

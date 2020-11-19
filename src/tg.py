@@ -2,13 +2,13 @@ import logging
 import os
 
 from aiogram import Dispatcher, Bot, types
+from aiogram.dispatcher.filters import BoundFilter
 from aiogram.dispatcher.filters import CommandStart
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from aiogram.utils import executor
 from loguru import logger
-from src import quiz
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
-from aiogram.dispatcher.filters import BoundFilter
 
+from src import quiz
 from src.quiz import Buttons
 
 dp = Dispatcher(Bot(token=os.environ["TG_BOT_TOKEN"], parse_mode=types.ParseMode.HTML))
@@ -43,13 +43,13 @@ async def bot_start(message: types.Message):
 
 @dp.message_handler(text=Buttons.NEW_QUESTION.value)
 async def echo(message: types.Message):
-    logging.debug("dialogflow_response")
+    logging.debug("NEW_QUESTION")
     await message.answer(await quiz.ask_question(user_id=f"tg-{message.from_user.id}"))
 
 
 @dp.message_handler(text=Buttons.GIVE_UP.value)
-async def echo(message: types.Message):
-    logging.debug("dialogflow_response")
+async def give_ip(message: types.Message):
+    logging.debug("give_ip")
     for response_message in await quiz.give_up(user_id=f"tg-{message.from_user.id}"):
         await message.answer(response_message)
 
@@ -65,7 +65,7 @@ async def verify_answer(message: types.Message):
     logging.debug("verify_answer")
 
     if await quiz.verify_answer(
-        user_id=f"tg-{message.from_user.id}", answer=message.text.lower()
+        user_id=f"tg-{message.from_user.id}", answer=message.text
     ):
         await message.answer(
             "Правильно! Поздравляю! Для следующего вопроса нажми «Новый вопрос»"

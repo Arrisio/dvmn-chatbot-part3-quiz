@@ -78,5 +78,6 @@ async def run_vk_bot():
 
     except (KeyboardInterrupt, SystemExit) as err:
         logger.info(f"shutting down.. {err}")
+        raise
 
     logger.info("vk bot stopped")

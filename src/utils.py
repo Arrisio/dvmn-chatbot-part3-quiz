@@ -1,73 +1,54 @@
-import asyncio
 import os
 import sys
-from contextlib import asynccontextmanager
 
 import aioredis
 from loguru import logger
 
-QUESTIONS_DB_ID = 1
-#
-# redis_questions_connection = None
-# redis_quiz_connection = None
-#
-#
-# async def init_redis_connections():
-#     global redis_quiz_connection
-#     global redis_questions_connection
-#
-#     r1 = await aioredis.create_redis_pool(
-#         address=(
-#             os.getenv("REDIS_HOST", "localhost"),
-#             os.getenv("REDIS_PORT", 6379),
-#         ),
-#         db=QUESTIONS_DB_ID,
-#         encoding="utf8",
-#     )
-#
-#     r2 = await aioredis.create_redis_pool(
-#         address=(
-#             os.getenv("REDIS_HOST", "localhost"),
-#             os.getenv("REDIS_PORT", 6379),
-#         ),
-#         encoding="utf8",
-#     )
-#
-#     redis_questions_connection=r1
-#     redis_quiz_connection=r2
-#
-#
-# async def get_redis_qestion()
+_DB_CONNECTION: aioredis.Redis = None
+_DB_CONNECTION_QUESTIONS: aioredis.Redis = None
 
-@asynccontextmanager
-async def redis_ctx_connection(
-    host: str = os.getenv("REDIS_HOST", "localhost"),
-    port: int = os.getenv("REDIS_PORT", 6379),
-    db: int = 0,
-) -> aioredis.connection:
-    logger.debug(
-        "trying to connect to redis", extra={"host": host, "port": port, "db": db}
-    )
-    try:
-        redis = await aioredis.create_redis_pool(
-            address=(host, port),
-            db=db,
+
+async def get_questions_db_connection(db_id=1) -> aioredis.Redis:
+    global _DB_CONNECTION_QUESTIONS
+
+    if not _DB_CONNECTION_QUESTIONS or _DB_CONNECTION_QUESTIONS.closed:
+        _DB_CONNECTION_QUESTIONS = await aioredis.create_redis_pool(
+            address=(
+                os.getenv("REDIS_HOST", "localhost"),
+                os.getenv("REDIS_PORT", 6379),
+            ),
+            encoding="utf8",
+            db=db_id,
+        )
+
+    return _DB_CONNECTION_QUESTIONS
+
+
+async def get_db_connection() -> aioredis.Redis:
+    global _DB_CONNECTION
+
+    if not _DB_CONNECTION or _DB_CONNECTION.closed:
+        _DB_CONNECTION = await aioredis.create_redis_pool(
+            address=(
+                os.getenv("REDIS_HOST", "localhost"),
+                os.getenv("REDIS_PORT", 6379),
+            ),
             encoding="utf8",
         )
 
-        logger.debug("redis connected successfilly", extra={"redis": redis.__repr__()})
-    except ConnectionRefusedError:
-        logger.error(
-            "cannot connect to specified redis server",
-            extra={"host": host, "port": port, "db": db},
-        )
-        raise
-    try:
-        yield redis
+    return _DB_CONNECTION
 
-    finally:
-        redis.close()
-        await redis.wait_closed()
+
+async def close_all_db_connections():
+    global _DB_CONNECTION, _DB_CONNECTION_QUESTIONS
+
+    if _DB_CONNECTION and not _DB_CONNECTION.closed:
+        _DB_CONNECTION.close()
+        await _DB_CONNECTION.wait_closed()
+
+    if _DB_CONNECTION_QUESTIONS and not _DB_CONNECTION_QUESTIONS.closed:
+        _DB_CONNECTION_QUESTIONS.close()
+        await _DB_CONNECTION_QUESTIONS.wait_closed()
 
 
 def get_logger_conf(log_level=os.getenv("LOG_LEVEL", "DEBUG")):
