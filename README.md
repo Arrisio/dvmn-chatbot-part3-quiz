@@ -29,11 +29,11 @@ pip3 install -r requirements.txt
 ```
 python3 main.py tg
 ```
-![](resources/examination-tg.gif)
+![](resources/examination_tg.gif)
 
 
 ```
 python3 main.py vk
 ```
-![](resources/examination-vk.gif)
+![](resources/examination_vk.gif)
 
