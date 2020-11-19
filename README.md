@@ -12,7 +12,7 @@ https://dvmn.org/modules/chat-bots/lesson/devman-bot/
 git clone https://github.com/Arrisio/dvmn-chatbot-part3-quiz.git
 ```
 
-2. Создать файл ```.env``` и поместить в него токены Telegram и ВКонтакте:
+2. Требуется определеить следующие переменные окружения:
 ```
 TG_BOT_TOKEN='Ваш токен'
 VK_TOKEN='Ваш токен'
