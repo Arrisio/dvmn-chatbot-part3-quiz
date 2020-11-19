@@ -58,13 +58,6 @@ def get_logger_conf(log_level=os.getenv("LOG_LEVEL", "DEBUG")):
                 "sink": sys.stdout,
                 "level": log_level,
                 "format": "<level>{level: <8}</level>|<cyan>{name:<12}</cyan>:<cyan>{function:<24}</cyan>:<cyan>{line}</cyan> - <level>{message:>32}</level> |{extra}",
-                "filter": lambda record: record["level"].no != logger.level("INFO").no,
-            },
-            {
-                "sink": sys.stdout,
-                "level": "INFO",
-                "format": "<level>{level: <8}</level><level>{message:>32}</level>",
-                "filter": lambda record: record["level"].no == logger.level("INFO").no,
             },
         ],
     }
