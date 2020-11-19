@@ -63,11 +63,11 @@ async def init_questions(
             return
 
         tmp_quiz_filename = "quiz-questions.zip"
-        # logger.debug(tmp_quiz_filename)
-        # download_file(
-        #     url=questions_archive_url,
-        #     filename=tmp_quiz_filename,
-        # )
+        logger.debug(tmp_quiz_filename)
+        download_file(
+            url=questions_archive_url,
+            filename=tmp_quiz_filename,
+        )
 
         await asyncio.wait([redis.set(q, a) for q, a in fetch_qnas(tmp_quiz_filename)])
 
