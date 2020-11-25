@@ -16,7 +16,7 @@ from src.vk import run_vk_bot
 @click.argument(
     "bot",
     type=click.Choice(["tg", "vk"]),
-    default="tg",
+    default="vk",
 )
 def main(bot):
     logger.configure(**get_logger_conf())
