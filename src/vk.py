@@ -7,6 +7,7 @@ from loguru import logger
 from vk_api.longpoll import VkLongPoll, VkEventType
 from vk_api.keyboard import VkKeyboard, VkKeyboardColor
 import anyio
+import concurrent.futures
 from src import quiz
 
 keyboard = VkKeyboard(one_time=True)
@@ -17,8 +18,7 @@ keyboard.add_button(quiz.Buttons.MY_SCORE.value, color=VkKeyboardColor.PRIMARY)
 
 
 async def process_message(event, vk):
-    # if event.type == VkEventType.MESSAGE_NEW and event.to_me:
-    if True:
+    if event.type == VkEventType.MESSAGE_NEW and event.to_me:
         logger.debug(
             "Income message",
             extra={"user_id": event.user_id, "text": event.text},
