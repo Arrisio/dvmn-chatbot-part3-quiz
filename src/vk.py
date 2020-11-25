@@ -97,4 +97,3 @@ async def run_vk_bot():
         logger.info(f"shutting down.. {err}")
         raise
 
-    logger.info("vk bot stopped")
