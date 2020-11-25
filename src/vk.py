@@ -1,6 +1,8 @@
 import asyncio
 import os
 import random
+from typing import Generator
+
 
 import vk_api
 from loguru import logger
@@ -74,7 +76,10 @@ async def process_message(event, vk):
             )
 
 
-def get_next_vk_event_from_listener(vk_listener):
+def get_next_vk_event_from_listener(vk_listener: Generator[VkEventType]) -> VkEventType:
+    """
+    Обертка на синхронным генератором, чтоб весь текущий модуль по обработке vk-ивентов мог работать асинхронно
+    """
     return vk_listener.send(None)
 
 
@@ -96,4 +101,3 @@ async def run_vk_bot():
     except (KeyboardInterrupt, SystemExit) as err:
         logger.info(f"shutting down.. {err}")
         raise
-
