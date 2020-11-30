@@ -1,6 +1,6 @@
 import asyncio
 
-import click
+import asyncclick as click
 from loguru import logger
 
 from src.init_questions import init_questions
@@ -9,30 +9,31 @@ from src.utils import (
     get_logger_conf,
     close_all_db_connections,
 )
-from src.vk import run_vk_bot
+# from src.vk import run_vk_bot
 
+# async def runner()
 
 @click.command()
 @click.argument(
     "bot",
     type=click.Choice(["tg", "vk"]),
-    default="vk",
+    default="tg",
 )
-def main(bot):
+async def main(bot):
     logger.configure(**get_logger_conf())
-    loop = asyncio.get_event_loop()
+    # loop = asyncio.get_event_loop()
 
-    loop.run_until_complete(init_questions())
-
+    # loop.run_until_complete()
+    # await init_questions()
     if bot == "tg":
-        run_tg_bot(loop=loop)
-    elif bot == "vk":
-        loop.run_until_complete(run_vk_bot())
+        await run_tg_bot()
+    # elif bot == "vk":
+    #     loop.run_until_complete(run_vk_bot())
     else:
         logger.error("incorrect bot option")
 
-    loop.run_until_complete(close_all_db_connections())
+    # loop.run_until_complete(close_all_db_connections())
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

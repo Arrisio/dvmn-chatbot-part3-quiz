@@ -1,5 +1,6 @@
 import logging
 import os
+import asyncio
 
 from aiogram import Dispatcher, Bot, types
 from aiogram.dispatcher.filters import BoundFilter
@@ -11,7 +12,9 @@ from loguru import logger
 from src import quiz
 from src.quiz import Buttons
 
-dp = Dispatcher(Bot(token=os.environ["TG_BOT_TOKEN"], parse_mode=types.ParseMode.HTML))
+loop=asyncio.get_event_loop()
+bot=Bot(token=os.environ["TG_BOT_TOKEN"], parse_mode=types.ParseMode.HTML, loop=loop)
+dp = Dispatcher(bot)
 
 
 class IsQuestionAsked(BoundFilter):
@@ -80,7 +83,9 @@ async def default_answer(message: types.Message):
     await message.answer('Нажмите "Новый вопрос" чтоб запустить викторину')
 
 
-def run_tg_bot(loop):
+async def run_tg_bot():
     logger.info("telegram service started")
-    executor.start_polling(dp, loop=loop)
+    # import anyio
+    # await anyio.run_sync_in_worker_thread(executor.start_polling, dp,asyncio.get_running_loop() )
+    executor.start_polling(dp, )
     logger.info("service service stopped")
