@@ -83,9 +83,8 @@ async def default_answer(message: types.Message):
     await message.answer('Нажмите "Новый вопрос" чтоб запустить викторину')
 
 
-async def run_tg_bot():
+def run_tg_bot():
     logger.info("telegram service started")
-    # import anyio
-    # await anyio.run_sync_in_worker_thread(executor.start_polling, dp,asyncio.get_running_loop() )
-    executor.start_polling(dp,loop=asyncio.get_running_loop() )
+    executor.start_polling(dp)
+    # executor.start_polling(dp, )
     logger.info("service service stopped")
