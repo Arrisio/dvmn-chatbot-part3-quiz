@@ -2,18 +2,19 @@ from enum import Enum
 
 from loguru import logger
 
-from src.utils import get_db_connection, get_questions_db_connection
+# from src.utils import question_db_ctx,quiz_state_db_ctx
+from src.utils import get_quiz_state_db_connection,get_questions_db_connection
 from typing import List
 
 
-async def if_question_asked(user_id: str) -> bool:
-    db = await get_db_connection()
+async def check_if_question_asked(user_id: str) -> bool:
+    quiz_state_db = await get_quiz_state_db_connection()
 
-    return await db.exists(user_id) == 1
+    return await quiz_state_db.exists(user_id) == 1
 
 
 async def ask_question(user_id: str) -> str:
-    db = await get_db_connection()
+    quiz_state_db = await get_quiz_state_db_connection()
     questions_db = await get_questions_db_connection()
 
     question = await questions_db.randomkey()
@@ -21,16 +22,16 @@ async def ask_question(user_id: str) -> str:
         "asking question",
         extra={"question": question, "answer": await questions_db.get(question)},
     )
-    await db.set(user_id, question)
+    await quiz_state_db.set(user_id, question)
 
     return question
 
 
 async def verify_answer(user_id: str, answer: str) -> bool:
-    db = await get_db_connection()
+    quiz_state_db = await get_quiz_state_db_connection()
     questions_db = await get_questions_db_connection()
 
-    question = await db.get(user_id)
+    question = await quiz_state_db.get(user_id)
     correct_answer = await questions_db.get(key=question)
 
     return correct_answer.lower() == answer.lower()
@@ -38,13 +39,19 @@ async def verify_answer(user_id: str, answer: str) -> bool:
 
 async def give_up(user_id: str) -> List[str]:
     """
-    :param user_id: tg or vk user_id , for example "tg-673451"
-    :return: messages list
+    Обрабатывает бизнес-сценарий сдачи пользователя.
+    Args:
+        user_id:
+
+    Returns:
+        возвращается правильный ответ и новый вопрос.
     """
-    db = await get_db_connection()
+
+
+    quiz_state_db = await get_quiz_state_db_connection()
     questions_db = await get_questions_db_connection()
 
-    if asked_question := await db.get(user_id):
+    if asked_question := await quiz_state_db.get(user_id):
         correct_answer = await questions_db.get(asked_question)
         new_question = await ask_question(user_id)
 

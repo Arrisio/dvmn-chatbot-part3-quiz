@@ -50,7 +50,7 @@ async def process_message(event, vk):
                 keyboard=keyboard.get_keyboard(),
                 random_id=random.randint(1, 1000),
             )
-        elif await quiz.if_question_asked(f"vk-{event.user_id}"):
+        elif await quiz.check_if_question_asked(f"vk-{event.user_id}"):
             if await quiz.verify_answer(
                 user_id=f"vk-{event.user_id}", answer=event.text
             ):
@@ -76,10 +76,16 @@ async def process_message(event, vk):
             )
 
 
-def get_next_vk_event_from_listener(vk_listener: Generator[VkEventType]) -> VkEventType:
+def get_next_vk_event_from_listener(vk_listener: Generator) -> VkEventType:
     """
-    Обертка на синхронным генератором, чтоб весь текущий модуль по обработке vk-ивентов мог работать асинхронно
+    Обертка над синхронным генератором, чтоб весь текущий модуль по обработке vk-ивентов мог работать асинхронно
+    Args:
+        vk_listener: генератор vk_api.longpoll.VkLongPoll().listen()
+
+    Returns:
+        vk_api.longpoll.VkEventType: Перечисление событий, получаемых от longpoll-сервера.
     """
+
     return vk_listener.send(None)
 
 
@@ -96,6 +102,8 @@ async def run_vk_bot():
             event = await anyio.run_sync_in_worker_thread(
                 get_next_vk_event_from_listener, vk_listener
             )
+            # async with anyio.create_task_group() as tg:
+            #     await tg.spawn(process_message, event, vk)
             loop.create_task(process_message(event, vk))
 
     except (KeyboardInterrupt, SystemExit) as err:

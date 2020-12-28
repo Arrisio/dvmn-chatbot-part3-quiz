@@ -1,6 +1,7 @@
 import logging
 import os
 import asyncio
+from  anyio import run
 
 from aiogram import Dispatcher, Bot, types
 from aiogram.dispatcher.filters import BoundFilter
@@ -19,7 +20,7 @@ dp = Dispatcher(bot)
 
 class IsQuestionAsked(BoundFilter):
     async def check(self, message: types.Message) -> bool:
-        return await quiz.if_question_asked(f"tg-{message.from_user.id}")
+        return await quiz.check_if_question_asked(f"tg-{message.from_user.id}")
 
 
 def setup(dp: Dispatcher):
@@ -39,19 +40,19 @@ keyboard = ReplyKeyboardMarkup(
 
 
 @dp.message_handler(CommandStart())
-async def bot_start(message: types.Message):
+async def reply_start_command(message: types.Message):
     logging.debug("bot_start")
     await message.answer(f'you entered "start" command', reply_markup=keyboard)
 
 
 @dp.message_handler(text=Buttons.NEW_QUESTION.value)
-async def echo(message: types.Message):
-    logging.debug("NEW_QUESTION")
+async def ask_new_question(message: types.Message):
+    logging.debug("ask_new_question")
     await message.answer(await quiz.ask_question(user_id=f"tg-{message.from_user.id}"))
 
 
 @dp.message_handler(text=Buttons.GIVE_UP.value)
-async def give_ip(message: types.Message):
+async def give_up(message: types.Message):
     logging.debug("give_ip")
     for response_message in await quiz.give_up(user_id=f"tg-{message.from_user.id}"):
         await message.answer(response_message)
@@ -78,14 +79,18 @@ async def verify_answer(message: types.Message):
 
 
 @dp.message_handler()
-async def default_answer(message: types.Message):
+async def reply_by_default(message: types.Message):
     logging.debug("default_answer")
     await message.answer('Нажмите "Новый вопрос" чтоб запустить викторину')
 
 
-def run_tg_bot():
+def run_tg_bot(loop):
     logger.info("telegram service started")
-    # import anyio
-    # await anyio.run_sync_in_worker_thread(executor.start_polling, dp,asyncio.get_running_loop() )
-    executor.start_polling(dp, )
+    executor.start_polling(dp, loop=loop)
     logger.info("service service stopped")
+# >    По поводу замечания 26 "Код можно заметно упростить, упаковав всё в один асинхронный контекстный менеджер как это делалось в модуле по асинхронному Python"
+# Обсуждали это в телеге, ответ проверяющего
+#>ХЗ как это обойти. Видимо, придётся смириться и подстроиться.
+#>Ну или запустить это добро в отдельном потоке.
+# Но т.к. использьзуются глобальные переменные, то идея с отдельным потоком не катит
+
