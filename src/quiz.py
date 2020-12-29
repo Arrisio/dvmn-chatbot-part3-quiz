@@ -1,10 +1,9 @@
 from enum import Enum
+from typing import List
 
 from loguru import logger
 
-# from src.utils import question_db_ctx,quiz_state_db_ctx
-from src.utils import get_quiz_state_db_connection,get_questions_db_connection
-from typing import List
+from src.utils import get_quiz_state_db_connection, get_questions_db_connection
 
 
 async def check_if_question_asked(user_id: str) -> bool:
@@ -37,7 +36,6 @@ async def verify_answer(user_id: str, answer: str) -> bool:
     return correct_answer.lower() == answer.lower()
 
 
-
 # использование названия give_up обсуждали в телеге
 # т.е. ответа я так и не получил - пока оставляю свой вариант
 async def give_up(user_id: str) -> List[str]:
@@ -49,7 +47,6 @@ async def give_up(user_id: str) -> List[str]:
     Returns:
         возвращается правильный ответ и новый вопрос.
     """
-
 
     quiz_state_db = await get_quiz_state_db_connection()
     questions_db = await get_questions_db_connection()

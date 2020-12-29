@@ -1,14 +1,11 @@
 import asyncio
-from anyio import run
 
-# import asyncclick as click
-from loguru import logger
 import click
+from loguru import logger
 
 from src.init_questions import init_questions, check_question_db_empty
 from src.tg import run_tg_bot
-from src.utils import get_logger_conf, setup_db_connections, close_all_db_connections
-
+from src.utils import get_logger_conf, close_all_db_connections
 from src.vk import run_vk_bot
 
 

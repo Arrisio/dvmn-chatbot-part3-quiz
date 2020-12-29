@@ -1,21 +1,17 @@
 import asyncio
-import re
 import os
+import re
 import zipfile
-
 
 import anyio
 import requests
 from loguru import logger
 from tqdm import tqdm
 
-
 from src.utils import (
     get_logger_conf,
     get_questions_db_connection,
     close_all_db_connections,
-    question_db_ctx,
-    setup_db_connections,
 )
 
 

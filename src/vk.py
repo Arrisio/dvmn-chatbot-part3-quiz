@@ -3,13 +3,12 @@ import os
 import random
 from typing import Generator
 
-
+import anyio
 import vk_api
 from loguru import logger
-from vk_api.longpoll import VkLongPoll, VkEventType
 from vk_api.keyboard import VkKeyboard, VkKeyboardColor
-import anyio
-import concurrent.futures
+from vk_api.longpoll import VkLongPoll, VkEventType
+
 from src import quiz
 
 keyboard = VkKeyboard(one_time=True)
@@ -51,9 +50,7 @@ async def process_message(event, vk):
                 random_id=random.randint(1, 1000),
             )
         elif await quiz.check_if_question_asked(f"vk-{event.user_id}"):
-            if await quiz.verify_answer(
-                user_id=f"vk-{event.user_id}", answer=event.text
-            ):
+            if await quiz.verify_answer(user_id=f"vk-{event.user_id}", answer=event.text):
                 vk.messages.send(
                     user_id=event.user_id,
                     message="Правильно! Поздравляю! Для следующего вопроса нажми «Новый вопрос»",
@@ -99,9 +96,7 @@ async def run_vk_bot():
         vk_listener = longpoll.listen()
 
         while True:
-            event = await anyio.run_sync_in_worker_thread(
-                get_next_vk_event_from_listener, vk_listener
-            )
+            event = await anyio.run_sync_in_worker_thread(get_next_vk_event_from_listener, vk_listener)
             # async with anyio.create_task_group() as tg:
             #     await tg.spawn(process_message, event, vk)
             loop.create_task(process_message(event, vk))

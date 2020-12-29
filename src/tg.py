@@ -1,7 +1,6 @@
+import asyncio
 import logging
 import os
-import asyncio
-from  anyio import run
 
 from aiogram import Dispatcher, Bot, types
 from aiogram.dispatcher.filters import BoundFilter
@@ -13,8 +12,8 @@ from loguru import logger
 from src import quiz
 from src.quiz import Buttons
 
-loop=asyncio.get_event_loop()
-bot=Bot(token=os.environ["TG_BOT_TOKEN"], parse_mode=types.ParseMode.HTML, loop=loop)
+loop = asyncio.get_event_loop()
+bot = Bot(token=os.environ["TG_BOT_TOKEN"], parse_mode=types.ParseMode.HTML, loop=loop)
 dp = Dispatcher(bot)
 
 
@@ -68,12 +67,8 @@ async def get_score(message: types.Message):
 async def verify_answer(message: types.Message):
     logging.debug("verify_answer")
 
-    if await quiz.verify_answer(
-        user_id=f"tg-{message.from_user.id}", answer=message.text
-    ):
-        await message.answer(
-            "Правильно! Поздравляю! Для следующего вопроса нажми «Новый вопрос»"
-        )
+    if await quiz.verify_answer(user_id=f"tg-{message.from_user.id}", answer=message.text):
+        await message.answer("Правильно! Поздравляю! Для следующего вопроса нажми «Новый вопрос»")
     else:
         await message.answer("Неправильно... Попробуешь ещё раз?")
 
@@ -84,13 +79,14 @@ async def reply_by_default(message: types.Message):
     await message.answer('Нажмите "Новый вопрос" чтоб запустить викторину')
 
 
+# >    По поводу замечания 26 "Код можно заметно упростить, упаковав всё в один асинхронный контекстный менеджер как это делалось в модуле по асинхронному Python"
+# Обсуждали это в телеге, ответ проверяющего
+# >ХЗ как это обойти. Видимо, придётся смириться и подстроиться.
+# >Ну или запустить это добро в отдельном потоке.
+# Но т.к. использьзуются глобальные переменные, то идея с отдельным потоком не катит
+
+
 def run_tg_bot(loop):
     logger.info("telegram service started")
     executor.start_polling(dp, loop=loop)
     logger.info("service service stopped")
-# >    По поводу замечания 26 "Код можно заметно упростить, упаковав всё в один асинхронный контекстный менеджер как это делалось в модуле по асинхронному Python"
-# Обсуждали это в телеге, ответ проверяющего
-#>ХЗ как это обойти. Видимо, придётся смириться и подстроиться.
-#>Ну или запустить это добро в отдельном потоке.
-# Но т.к. использьзуются глобальные переменные, то идея с отдельным потоком не катит
-
