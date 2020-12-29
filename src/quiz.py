@@ -37,6 +37,9 @@ async def verify_answer(user_id: str, answer: str) -> bool:
     return correct_answer.lower() == answer.lower()
 
 
+
+# использование названия give_up обсуждали в телеге
+# т.е. ответа я так и не получил - пока оставляю свой вариант
 async def give_up(user_id: str) -> List[str]:
     """
     Обрабатывает бизнес-сценарий сдачи пользователя.
