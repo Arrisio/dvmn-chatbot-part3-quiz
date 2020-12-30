@@ -1,11 +1,7 @@
-import contextvars
 import os
 import sys
 
 import aioredis
-
-
-from contextlib import asynccontextmanager
 
 _DB_CONNECTION: aioredis.Redis = None
 _DB_CONNECTION_QUESTIONS: aioredis.Redis = None
@@ -21,7 +17,6 @@ def get_logger_conf(log_level=os.getenv("LOG_LEVEL", "DEBUG")):
             },
         ],
     }
-
 
 
 async def get_questions_db_connection(db_id=1) -> aioredis.Redis:
@@ -65,6 +60,3 @@ async def close_all_db_connections():
     if _DB_CONNECTION_QUESTIONS and not _DB_CONNECTION_QUESTIONS.closed:
         _DB_CONNECTION_QUESTIONS.close()
         await _DB_CONNECTION_QUESTIONS.wait_closed()
-
-
-
