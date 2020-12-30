@@ -73,17 +73,19 @@ async def init_questions(
     redis = await get_questions_db_connection()
 
     tmp_quiz_filename = "quiz-questions2.zip"  # не используется библиотека tempfile, т.к. для корректной работы на винде треуебтся слишком много приседаний
+    try:
+        download_file(
+            url=questions_url,
+            filename=tmp_quiz_filename,
+        )
 
-    download_file(
-        url=questions_url,
-        filename=tmp_quiz_filename,
-    )
+        async with anyio.create_task_group() as tg:
+            for q, a in extract_qnas_from_zip(tmp_quiz_filename):
+                await tg.spawn(redis.set, q, a)
 
-    async with anyio.create_task_group() as tg:
-        for q, a in extract_qnas_from_zip(tmp_quiz_filename):
-            await tg.spawn(redis.set, q, a)
+    finally:
+        os.remove(tmp_quiz_filename)
 
-    os.remove(tmp_quiz_filename)
     logger.info("questions are ready")
 
 
