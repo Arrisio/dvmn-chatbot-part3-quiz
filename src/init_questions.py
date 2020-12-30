@@ -53,11 +53,10 @@ def extract_question_and_answer(
         return question, answer
 
 
-def extract_qnas_from_zip(archive_path=None):
+def extract_qnas_from_zip(archive_path: str):
     pattern = re.compile(r"Вопрос\s+\d+:\n(.*?)[\n]+Ответ:\n+(.*?)\.\n", flags=re.S)
 
     with zipfile.ZipFile(archive_path) as zip_handler:
-        # with zipfile.ZipFile(BytesIO(fh.read())) as zip_handler:
         logger.info("start converting questions archive")
         for question_file_name in tqdm(zip_handler.namelist()):
             with zip_handler.open(question_file_name) as question_file_name_handler:
