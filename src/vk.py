@@ -97,9 +97,9 @@ async def run_vk_bot():
         vk = vk_session.get_api()
         vk_listener = longpoll.listen()
 
-        while True:
-            event = await anyio.run_sync_in_worker_thread(get_next_vk_event_from_listener, vk_listener)
-            async with anyio.create_task_group() as tg:
+        async with anyio.create_task_group() as tg:
+            while True:
+                event = await anyio.run_sync_in_worker_thread(get_next_vk_event_from_listener, vk_listener)
                 await tg.spawn(process_message, event, vk)
 
     except (KeyboardInterrupt, SystemExit) as err:
