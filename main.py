@@ -35,7 +35,6 @@ def main(bot, reload, url):
     if reload or is_question_db_empty:
         loop.run_until_complete(init_questions(url))
 
-    # asyncio.run(init_questions())
     if bot == "tg":
         run_tg_bot(loop)
     elif bot == "vk":
@@ -47,5 +46,4 @@ def main(bot, reload, url):
 
 
 if __name__ == "__main__":
-    # asyncio.run(main())
     main()
