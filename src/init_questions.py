@@ -20,10 +20,7 @@ def download_file(
     filename: str,
     chunk_size: int = 1024,
 ):
-    """
-    Helper method handling downloading large files from `url` to `filename`.
-    """
-
+    """Helper method handling downloading large files from `url` to `filename`."""
     r = requests.get(url, stream=True)
     logger.info("start downloading questions archive")
     with open(filename, "wb") as f:
@@ -36,21 +33,6 @@ def download_file(
 
 async def check_question_db_empty():
     return await (await get_questions_db_connection()).dbsize() == 0
-
-
-def extract_question_and_answer(
-    question_text_block: str,
-    question_pattern=re.compile(r"Вопрос \d{1,4}:\n(.*)", flags=re.DOTALL),
-    answer_pattern=re.compile(r"Ответ:\n(.*)", flags=re.DOTALL),
-):
-    question = answer = None
-    for block_part in question_text_block.split("\n\n"):
-        if questions := question_pattern.findall(block_part):
-            question = questions[0]
-        if answers := answer_pattern.findall(block_part):
-            answer = answers[0].split(".")[0].lower()
-    if question and answer:
-        return question, answer
 
 
 def extract_qnas_from_zip(archive_path: str):

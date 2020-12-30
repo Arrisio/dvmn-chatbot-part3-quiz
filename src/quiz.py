@@ -39,15 +39,14 @@ async def verify_answer(user_id: str, answer: str) -> bool:
 # использование названия give_up обсуждали в телеге
 # т.е. ответа я так и не получил - пока оставляю свой вариант
 async def give_up(user_id: str) -> List[str]:
-    """
-    Обрабатывает бизнес-сценарий сдачи пользователя.
+    """Обрабатывает бизнес-сценарий сдачи пользователя.
+
     Args:
         user_id:
 
     Returns:
         возвращается правильный ответ и новый вопрос.
     """
-
     quiz_state_db = await get_quiz_state_db_connection()
     questions_db = await get_questions_db_connection()
 

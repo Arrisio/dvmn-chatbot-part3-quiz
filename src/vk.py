@@ -1,4 +1,3 @@
-import asyncio
 import os
 import random
 from typing import Generator
