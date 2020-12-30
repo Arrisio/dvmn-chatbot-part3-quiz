@@ -53,8 +53,9 @@ async def ask_new_question(message: types.Message):
 @dp.message_handler(text=Buttons.GIVE_UP.value)
 async def give_up(message: types.Message):
     logging.debug("give_ip")
-    for response_message in await quiz.give_up(user_id=f"tg-{message.from_user.id}"):
-        await message.answer(response_message)
+    if answer := await quiz.get_answer_to_asked_question(user_id=f"tg-{message.from_user.id}"):
+        await message.answer(answer)
+    await message.answer(await quiz.ask_question(user_id=f"tg-{message.from_user.id}"))
 
 
 @dp.message_handler(text=Buttons.MY_SCORE.value)

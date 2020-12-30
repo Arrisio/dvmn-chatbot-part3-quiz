@@ -1,5 +1,4 @@
 from enum import Enum
-from typing import List
 
 from loguru import logger
 
@@ -36,28 +35,11 @@ async def verify_answer(user_id: str, answer: str) -> bool:
     return correct_answer.lower() == answer.lower()
 
 
-# использование названия give_up обсуждали в телеге
-# т.е. ответа я так и не получил - пока оставляю свой вариант
-async def give_up(user_id: str) -> List[str]:
-    """Обрабатывает бизнес-сценарий сдачи пользователя.
-
-    Args:
-        user_id:
-
-    Returns:
-        возвращается правильный ответ и новый вопрос.
-    """
+async def get_answer_to_asked_question(user_id: str) -> str:
     quiz_state_db = await get_quiz_state_db_connection()
     questions_db = await get_questions_db_connection()
-
     if asked_question := await quiz_state_db.get(user_id):
-        correct_answer = await questions_db.get(asked_question)
-        new_question = await ask_question(user_id)
-
-        return [correct_answer, new_question]
-
-    else:
-        return ["Рано сдаваться. ничего  еще не спросили!"]
+        return await questions_db.get(asked_question)
 
 
 class Buttons(Enum):

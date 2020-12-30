@@ -33,14 +33,19 @@ async def process_message(event, vk):
                 random_id=random.randint(1, 1000),
             )
         elif event.text == quiz.Buttons.GIVE_UP.value:
-            messages = await quiz.give_up(f"vk-{event.user_id}")
-            for message in messages:
+            if answer:=await quiz.get_answer_to_asked_question(user_id=f"vk-{event.user_id}"):
                 vk.messages.send(
                     user_id=event.user_id,
-                    message=message,
+                    message=answer,
                     keyboard=keyboard.get_keyboard(),
                     random_id=random.randint(1, 1000),
                 )
+            vk.messages.send(
+                user_id=event.user_id,
+                message=await quiz.ask_question(user_id=f"vk-{event.user_id}"),
+                keyboard=keyboard.get_keyboard(),
+                random_id=random.randint(1, 1000),
+            )
         elif event.text == quiz.Buttons.MY_SCORE.value:
             vk.messages.send(
                 user_id=event.user_id,
