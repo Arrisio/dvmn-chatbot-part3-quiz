@@ -10,37 +10,6 @@ from contextlib import asynccontextmanager
 _DB_CONNECTION: aioredis.Redis = None
 _DB_CONNECTION_QUESTIONS: aioredis.Redis = None
 
-quiz_state_db_ctx: contextvars.ContextVar[aioredis.Redis] = contextvars.ContextVar('db_connection_quiz_state')
-question_db_ctx: contextvars.ContextVar[aioredis.Redis] = contextvars.ContextVar('db_connection_questions')
-
-@asynccontextmanager
-async def setup_db_connections():
-    quiz_state_db_ctx.set(await aioredis.create_redis_pool(
-        address=(
-            os.getenv("REDIS_HOST", "localhost"),
-            os.getenv("REDIS_PORT", 6379),
-        ),
-        encoding="utf8",
-        db=os.getenv("REDIS_QUIZ_STATE_DB", 0),
-    ))
-    question_db_ctx.set(await aioredis.create_redis_pool(
-        address=(
-            os.getenv("REDIS_HOST", "localhost"),
-            os.getenv("REDIS_PORT", 6379),
-        ),
-        encoding="utf8",
-        db=os.getenv("REDIS_QUESTIONS_DB", 1),
-    ))
-
-    try:
-        yield
-    finally:
-        quiz_state_db_ctx.get().close()
-        question_db_ctx.get().close()
-        await quiz_state_db_ctx.get().wait_closed()
-        await question_db_ctx.get().wait_closed()
-
-
 
 def get_logger_conf(log_level=os.getenv("LOG_LEVEL", "DEBUG")):
     return {
