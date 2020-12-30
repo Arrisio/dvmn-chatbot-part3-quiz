@@ -87,7 +87,6 @@ def get_next_vk_event_from_listener(vk_listener: Generator) -> VkEventType:
 
 
 async def run_vk_bot():
-    loop = asyncio.get_running_loop()
     logger.info("vk bot started")
     try:
         vk_session = vk_api.VkApi(token=os.environ["VK_TOKEN"])
@@ -97,9 +96,8 @@ async def run_vk_bot():
 
         while True:
             event = await anyio.run_sync_in_worker_thread(get_next_vk_event_from_listener, vk_listener)
-            # async with anyio.create_task_group() as tg:
-            #     await tg.spawn(process_message, event, vk)
-            loop.create_task(process_message(event, vk))
+            async with anyio.create_task_group() as tg:
+                await tg.spawn(process_message, event, vk)
 
     except (KeyboardInterrupt, SystemExit) as err:
         logger.info(f"shutting down.. {err}")
