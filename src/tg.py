@@ -41,7 +41,7 @@ keyboard = ReplyKeyboardMarkup(
 @dp.message_handler(CommandStart())
 async def reply_start_command(message: types.Message):
     logging.debug("bot_start")
-    await message.answer(f'you entered "start" command', reply_markup=keyboard)
+    await message.answer('you entered "start" command', reply_markup=keyboard)
 
 
 @dp.message_handler(text=Buttons.NEW_QUESTION.value)

@@ -73,15 +73,14 @@ async def process_message(event, vk):
 
 
 def get_next_vk_event_from_listener(vk_listener: Generator) -> VkEventType:
-    """
-    Обертка над синхронным генератором, чтоб весь текущий модуль по обработке vk-ивентов мог работать асинхронно
+    """Обертка над синхронным генератором, чтоб весь текущий модуль по обработке vk-ивентов мог работать асинхронно.
+
     Args:
         vk_listener: генератор vk_api.longpoll.VkLongPoll().listen()
 
     Returns:
         vk_api.longpoll.VkEventType: Перечисление событий, получаемых от longpoll-сервера.
     """
-
     return vk_listener.send(None)
 
 
